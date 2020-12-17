@@ -3,6 +3,7 @@
 # this function works with data generated in class with slight modifications to the column names
 # requires a dataframe with column titles LatY, 
 # LongX, Leaves, flower, seeds
+# example: Make_life_table<- (mydata)
 
 
 
