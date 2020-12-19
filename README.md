@@ -5,3 +5,4 @@ R functions related to analyzing silphium populations
 2) Create_lx_curve generates an ln(lx) survivorship curve for every geographic coordinate.
 3) parasite_lx generates a ln(lx) survivorship curve for every geographic coordinate but colors each line according to parasitism status.
 4) Make_life_table generates a seperate lifetable for every geographic coordinate as a single dataframe.
+5) lx_year generates survivorship curves for every year. 
