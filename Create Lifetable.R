@@ -1,5 +1,6 @@
 ##load required dependencies
 # library(dplyr)
+# library(plyr)
 # this function works with data generated in class with slight modifications to the column names
 # requires a dataframe with column titles LatY, 
 # LongX, Leaves, flower, seeds
@@ -85,9 +86,11 @@ Make_life_table<- function(x) {
 x<- x %>% group_by(LatY, LongX) %>% group_split()
 
 #apply the lifetable function to each group splitted by earlier
-bb<- lapply(x, Make_life_table)
+x<- lapply(x, Make_life_table)
+  
+x<- plyr::ldply(x, rbind)
 
-return(bb)
+return(x)
 }
 
 
