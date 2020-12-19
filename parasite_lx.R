@@ -26,7 +26,7 @@ parasite_lx<- function(x) {
     dplyr::select(-c(sum_flower, sum_seed))
   
   yes <- yes %>% mutate("bx (seeds/stalk)"= sum_seed/Ax) %>% 
-    dplyr::rename("Number of leaves (age) x" = Leaves) %>% 
+    dplyr::rename("Number of Leaves (age) x" = Leaves) %>% 
     dplyr::select(-c(sum_flower, sum_seed))
 
   #for every unique combination of coordinates
