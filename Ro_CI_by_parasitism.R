@@ -127,7 +127,9 @@ Ro_CI_by_parasitism<- function(x) {
     geom_errorbar(aes(x= Status, y= Ro,
       ymin= lower_CI, 
       ymax= upper_CI))+
-    labs(title = "Net Reproductive Value Comparison Parasitized vs Non-parasitized",
+    ylim(0,12.5)+
+    labs(title = "Average Net Reproductive Value of Parasitized vs Non-parasitized 
+         Silphium Albiflorum Subpopulations",
          subtitle = "(Error Bars Represent 95% CI)",
          y = "Net Reproductive Value (Ro)", 
          x= "Parasitism Status")+
