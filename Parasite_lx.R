@@ -1,38 +1,46 @@
 ##load required dependencies
-# library(dplyr)
-# library(plyr)
-# library(ggplot2)
-# input data requires dataframe with column 
-# names in this order and as follows LatY, LongX, Leaves, flower, seeds, Parasitized
-# example: parasite_lx(mydata)
+#library(dplyr)
+#library(plyr)
+#library(ggplot2)
+#library(RColorBrewer)
 
+# input data requires unaggregated cencus dataframe just like what we collected in class
+# Names must in this order and as follows LatY, LongX, Leaves, flower, seeds, Parasitized
 
-parasite_lx<- function(x) {
+##### example: parasite_lx(Example_data_for_parasitized_calculations)
+
+Parasite_lx <- function(x) {
+  
+
   #replace NA with zero and create two new dataframes seperated by parasitizism
   x[is.na(x)] <- 0
   no<- x %>% filter(Parasitized == 0)
   yes<- x %>% filter(Parasitized == 1)
   
+  #get ride of parasitized status for function to process
+  no<- no %>% select(-Parasitized)
+  yes<- yes %>% select(-Parasitized)
   
-  #aggregate data by counting summarizing unique rows of the same combinations of coordinates 
-  #and leaves then summing the number of seeds and flowering stalk for those combinations
+  #aggregate data
   no<- no %>% group_by(LatY, LongX, Leaves) %>% 
-    dplyr::summarise(Ax =n(), sum_flower = sum(flower), sum_seed= sum(seeds))
-  yes<- yes %>% group_by(LatY, LongX, Leaves) %>% 
     dplyr::summarise(Ax =n(), sum_flower = sum(flower), sum_seed= sum(seeds))
   
   no <- no %>% mutate("bx (seeds/stalk)"= sum_seed/Ax) %>% 
     dplyr::rename("Number of leaves (age) x" = Leaves) %>% 
     dplyr::select(-c(sum_flower, sum_seed))
   
+  yes<- yes %>% group_by(LatY, LongX, Leaves) %>% 
+    dplyr::summarise(Ax =n(), sum_flower = sum(flower), sum_seed= sum(seeds))
+  
   yes <- yes %>% mutate("bx (seeds/stalk)"= sum_seed/Ax) %>% 
-    dplyr::rename("Number of Leaves (age) x" = Leaves) %>% 
+    dplyr::rename("Number of leaves (age) x" = Leaves) %>% 
     dplyr::select(-c(sum_flower, sum_seed))
-
+  
+  
   #for every unique combination of coordinates
   #split data into seperate groups 
-  yes<- yes %>% group_by(LatY, LongX) %>% group_split()
   no<- no %>% group_by(LatY, LongX) %>% group_split()
+  yes<- yes %>% group_by(LatY, LongX) %>% group_split()
   
   
   #this is the function that makes the lifetable
@@ -89,46 +97,50 @@ parasite_lx<- function(x) {
       vx[i]<- `e^(rx)/lx`[i]*`sumofe^-rx*lybx`[i+1]
     }
     
+    
     x<- tibble(x$LatY, x$LongX, x$`Number of leaves (age) x`, x$Ax, x$`bx (seeds/stalk)`, 
                Sx, lx, gx,`lx_bx`,`lx_bx_x`,
                `lx*e^rx`, cx, `e^(rx)/lx`,
                `e^-rx*lx*bx`, `sumofe^-rx*lybx`, vx)
   }
-
+  
+  
   #apply the lifetable function to each group splitted by earlier
-  bb<- lapply(yes, Make_life_table)
-  bn<- lapply(no, Make_life_table)
+  no<- lapply(no, Make_life_table)
+  yes<- lapply(yes, Make_life_table)
   
+  #list into dataframe
+  no<- plyr::ldply(no, rbind)
+  yes<- plyr::ldply(yes, rbind)
   
-  bb<- plyr::ldply(bb, rbind)
-  
-  bn<- plyr::ldply(bn, rbind)
-  
-  #label dataframe by treatment status
-  bb$Status <- "Parasitized"
-  bn$Status <- "Non-parasitized"
-  newDF<- rbind(bb, bn)
+  #Create treatment status factor variable
+  no$Status <- "Parasitized"
+  yes$Status <- "Non-parasitized"
+  newDF<- rbind(no, yes)
   newDF<- as_tibble(newDF)
   names(newDF)[1]<- "LatY"
   names(newDF)[2]<- "LongX"
   names(newDF)[3]<- "leaves"
   
   newerDF<- newDF %>% select(LatY, LongX, leaves, lx, Status)
- 
- h<- newerDF %>% filter(Status == "Parasitized")
- j<- newerDF %>% filter(Status == "Non-parasitized")
- 
-
-#plot data
-g<- ggplot()+ 
-  geom_line(data = h, aes(x= leaves, y = log(lx), group= interaction(LatY, LongX), color=Status))+
-  geom_line(data = j, aes(x= leaves, y = log(lx), group= interaction(LatY, LongX), color=Status))+
-  theme_bw()+
-  labs(title = "Survivorship Comparison Between 
-       Parasitized and Non-parasitized Silphium Albiflorum Subpopulations", 
-       x="Number of leaves (age) x", 
-       y="ln(lx)")+
-  theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = .5))
-return(g)
+  
+  h<- newerDF %>% filter(Status == "Parasitized")
+  j<- newerDF %>% filter(Status == "Non-parasitized")
+  
+  #plot data
+  g<- ggplot()+ 
+    geom_line(data = h, aes(x= leaves, y = log(lx), group= interaction(LatY, LongX), color=Status))+
+    geom_line(data = j, aes(x= leaves, y = log(lx), group= interaction(LatY, LongX), color=Status))+
+    theme_bw()+
+    labs(title=expression(paste(italic("Silphium albiflorum "), "Survivorship Curve")), 
+                subtitle = "Parasitized vs Non-parasitized",
+         x="Number of leaves (age) x", 
+         y="ln(lx)")+
+    scale_color_brewer(palette = "Accent")
+  g
+  return(g)
 }
 
+  
+  
+  
