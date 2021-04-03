@@ -109,7 +109,7 @@ Parasite_lx <- function(x) {
   no<- lapply(no, Make_life_table)
   yes<- lapply(yes, Make_life_table)
   
-  #list into dataframe
+  #Turn the list into dataframe
   no<- plyr::ldply(no, rbind)
   yes<- plyr::ldply(yes, rbind)
   
@@ -122,8 +122,8 @@ Parasite_lx <- function(x) {
   names(newDF)[2]<- "LongX"
   names(newDF)[3]<- "leaves"
   
+  #preperation for graphing
   newerDF<- newDF %>% select(LatY, LongX, leaves, lx, Status)
-  
   h<- newerDF %>% filter(Status == "Parasitized")
   j<- newerDF %>% filter(Status == "Non-parasitized")
   
