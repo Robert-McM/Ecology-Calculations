@@ -10,10 +10,8 @@
 # multiply the entire column by 1 in excel and re-import or do the following in R
 # mydata$seeds <- as.numeric(as.character(mydata$seeds))
 
-
-
 Create_lx_curve<- function(x) {
-
+  
   
   #aggregate data by counting summarizing unique rows of the same combinations of coordinates 
   #and leaves then summing the number of seeds and flowering stalk for those combinations
@@ -94,7 +92,7 @@ Create_lx_curve<- function(x) {
   
   
   #graphing begins here
-    
+  
   x <- lapply(bb, "[", , c("x$`Number of leaves (age) x`", "lx"))
   
   new_col_name <- c("x", "lx")
@@ -102,15 +100,13 @@ Create_lx_curve<- function(x) {
   
   p <- ggplot()
   for (i in 1:length(result)) p <- p + geom_line(data=result[[i]], aes(x,log(lx), col=lx), 
-                                                 size =.2)+ 
+                                                 size =.2, alpha= 0.50)+ 
     ylim(-5, 0)+
-    labs(title = "Silphium Albiflorum Survivorship Curve by Subpopulation Locality", 
+    labs(title=expression(paste(italic("Silphium albiflorum "), "Survivorship Curve",)),
+         subtitle = "By Subpopulation Locality", 
          y= "ln(lx)", x= "Number of leaves (age) x")+
-    scale_color_gradient(low="#00BFC4", high="#F8766D")+
     guides(fill=guide_legend(title='lx'))+
-    theme_bw()+ 
-    theme(plot.title = element_text(hjust = 0.5), plot.subtitle = element_text(hjust = .5))
-  
+    theme_bw()
   return (p)
   
 }
