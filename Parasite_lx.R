@@ -17,7 +17,7 @@ Parasite_lx <- function(x) {
   no<- x %>% filter(Parasitized == 0)
   yes<- x %>% filter(Parasitized == 1)
   
-  #get ride of parasitized status for function to process
+  #get rid of parasitized status for function to process
   no<- no %>% select(-Parasitized)
   yes<- yes %>% select(-Parasitized)
   
